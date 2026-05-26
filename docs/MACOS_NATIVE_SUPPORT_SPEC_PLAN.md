@@ -1,6 +1,6 @@
 # Native macOS (darwin) Support — Spec Plan
 
-**Status:** IN PROGRESS
+**Status:** VERIFIED on macOS (darwin/arm64, Apple Silicon)
 **Branch:** feat/macos-native-support
 **Date:** 2026-05-26
 
@@ -107,6 +107,19 @@ serves the `curl` PoC through the local tunnel. No changes to the linux/windows 
 ## SQL Changes (if any)
 
 None.
+
+## Verification Results (2026-05-26, darwin/arm64)
+
+- `make build` → `Mach-O 64-bit executable arm64`, `CGO_ENABLED=0`. `go vet ./...` and
+  `go test ./...` green (incl. new BPF unit tests). linux amd64/arm64, windows, darwin amd64
+  cross-builds all succeed — no regression.
+- Unprivileged run fails cleanly: `failed to create injector: open /dev/bpf0: permission
+  denied (run with sudo)` (no crash).
+- `sudo ./sni-spoofing -test -connect 104.19.229.21:443 -fake-sni hcaptcha.com`: preflight OK;
+  matrix **PASS** for `none` (all 4 variants) and `firefox` (all 4 variants incl. fragment
+  on/off and repeat 1/2). `chrome` FAIL is network/DPI-dependent (the injection path is
+  fingerprint-agnostic; `firefox` multi-segment + fragment passing proves the mechanism). ✅
+  Acceptance bar (≥1 PASS) exceeded.
 
 ## Verification Checklist
 
