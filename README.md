@@ -2,7 +2,7 @@
 
 A **Go implementation** of the [SNI-Spoofing](https://github.com/patterniha/SNI-Spoofing) DPI bypass tool, originally written in Python by [@patterniha](https://github.com/patterniha).
 
-Cross-platform: **Windows** with WinDivert and **Linux/OpenWrt** with nfqueue plus a raw socket.
+Cross-platform: **Windows** with WinDivert, **Linux/OpenWrt** with nfqueue plus a raw socket, and **macOS** with a passive BPF tap plus link-layer injection.
 
 ## Credits & Acknowledgments
 
@@ -27,10 +27,11 @@ This tool acts as a local TCP proxy that:
 
 ## Platform Support
 
-| Platform          | Packet Interception | Fake Injection | Requirements                                |
-| ----------------- | ------------------- | -------------- | ------------------------------------------- |
-| **Windows**       | WinDivert driver    | WinDivert send | Run as Administrator; driver is embedded    |
-| **Linux/OpenWrt** | nfqueue (netfilter) | Raw socket     | `iptables`, `nfnetlink_queue` kernel module |
+| Platform          | Packet Interception   | Fake Injection      | Requirements                                |
+| ----------------- | --------------------- | ------------------- | ------------------------------------------- |
+| **Windows**       | WinDivert driver      | WinDivert send      | Run as Administrator; driver is embedded    |
+| **Linux/OpenWrt** | nfqueue (netfilter)   | Raw socket          | `iptables`, `nfnetlink_queue` kernel module |
+| **macOS**         | BPF tap (`/dev/bpf`)  | BPF link-layer write | Run with `sudo`; Ethernet/Wi-Fi or utun interface |
 
 ## Quick Start
 
@@ -46,7 +47,15 @@ make dist
 make linux-amd64
 make linux-arm64
 make windows
+make darwin-arm64   # macOS Apple Silicon
+make darwin-amd64   # macOS Intel
+
+# or just build for the machine you are on:
+make build
 ```
+
+The macOS build is pure Go (`CGO_ENABLED=0`); it uses a passive BPF tap and link-layer
+injection, so no libpcap or kernel extension is required.
 
 The Windows binary embeds the WinDivert driver through the local `godivert` module. You do not need to ship `WinDivert.dll` or `WinDivert64.sys` beside `sni-spoofing.exe`.
 
@@ -60,6 +69,9 @@ Configuration can come from CLI flags or an INI file. If `-config` is not provid
 
 # Linux/OpenWrt (as root)
 sudo ./sni-spoofing-linux-amd64 -listen 127.0.0.1:40443 -connect 104.19.229.21:443 -fake-sni hcaptcha.com -utls firefox
+
+# macOS (with sudo; BPF requires root)
+sudo ./sni-spoofing -listen 127.0.0.1:40443 -connect 104.19.229.21:443 -fake-sni hcaptcha.com -utls firefox
 ```
 
 Useful options:
