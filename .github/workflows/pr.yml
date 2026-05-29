@@ -1,0 +1,136 @@
+name: PR checks
+
+on:
+  pull_request:
+    paths:
+      - "gui/**"
+      - ".github/workflows/pr.yml"
+      - "proxy/**"
+      - "*.go"
+      - "go.mod"
+      - "go.sum"
+      - "config/**"
+      - "injection/**"
+      - "network/**"
+      - "packet/**"
+  push:
+    branches: [main]
+    paths:
+      - "gui/**"
+      - ".github/workflows/pr.yml"
+      - "proxy/**"
+      - "*.go"
+      - "go.mod"
+      - "go.sum"
+      - "config/**"
+      - "injection/**"
+      - "network/**"
+      - "packet/**"
+
+jobs:
+  gui-smoke:
+    name: GUI checks (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux/amd64
+          - os: windows-latest
+            platform: windows/amd64
+          - os: macos-latest
+            platform: darwin/universal
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: gui/frontend/package-lock.json
+
+      - name: Check godivert replace stays in lockstep
+        # gui/go.mod mirrors the root's `replace github.com/one-api/godivert =>
+        # github.com/aleskxyz/godivert …` so the GUI's transitive injection
+        # import resolves the same fork as the CLI. If a future bump touches
+        # one go.mod and forgets the other, the GUI will silently link a
+        # different godivert build than the CLI ships. Fail loudly here.
+        run: |
+          set -euo pipefail
+          root=$(grep -E '^replace github\.com/one-api/godivert' go.mod || true)
+          gui=$(grep -E '^replace github\.com/one-api/godivert' gui/go.mod || true)
+          if [[ -z "$root" || -z "$gui" ]]; then
+            echo "missing godivert replace in one of the go.mod files:"
+            echo "  root: $root"
+            echo "  gui:  $gui"
+            exit 1
+          fi
+          if [[ "$root" != "$gui" ]]; then
+            echo "godivert replace drift between root and gui go.mod:"
+            echo "  root: $root"
+            echo "  gui:  $gui"
+            exit 1
+          fi
+
+      - name: Install Linux WebKit deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+
+      # macOS: Xcode Command Line Tools are pre-installed on GitHub-hosted
+      # macos-latest runners, so no setup step is needed for the Wails build.
+      # Windows: WebView2 runtime is pre-installed on GitHub-hosted
+      # windows-latest runners, so no setup step is needed either.
+
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.12.0
+
+      - name: npm ci
+        working-directory: gui/frontend
+        run: npm ci
+
+      - name: go vet (gui module)
+        working-directory: gui
+        run: go vet ./...
+
+      - name: go test (gui module)
+        working-directory: gui
+        run: go test -count=1 ./...
+
+      - name: npm audit (production, high+ only)
+        working-directory: gui/frontend
+        # Gate only on high/critical advisories — moderate-severity findings
+        # in transitive deps are common and would otherwise turn this step
+        # into a tripwire that blocks unrelated PRs every time a downstream
+        # advisory drops without a fix. Moderate findings still show up in
+        # the full `npm audit` output for visibility.
+        run: |
+          npm audit --omit=dev || true
+          npm audit --omit=dev --audit-level=high
+
+      - name: vitest (frontend unit tests)
+        working-directory: gui/frontend
+        run: npm test
+
+      - name: Wails build (smoke)
+        working-directory: gui
+        run: wails build -platform ${{ matrix.platform }} -trimpath -clean
+
+      - name: svelte-check (after wails generates bindings)
+        working-directory: gui/frontend
+        run: npm run check

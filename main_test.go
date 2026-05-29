@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"sni-spoofing-go/config"
-	"sni-spoofing-go/injection"
 	"sni-spoofing-go/packet"
 )
 
@@ -78,75 +77,5 @@ func TestEffectiveListenAddr(t *testing.T) {
 	}
 	if got := effectiveListenAddr("0.0.0.0:40443", false); got != "0.0.0.0:40443" {
 		t.Fatalf("normal listen addr = %q", got)
-	}
-}
-
-func TestParseCloudflareTraceIP(t *testing.T) {
-	got, err := parseCloudflareTraceIP("colo=FRA\nip=94.101.178.10\n")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got != "94.101.178.10" {
-		t.Fatalf("ip = %q", got)
-	}
-	if _, err := parseCloudflareTraceIP("colo=FRA\n"); err == nil {
-		t.Fatal("expected missing ip error")
-	}
-}
-
-func TestParseArvanTraceIP(t *testing.T) {
-	got, err := parseArvanTraceIP("<html>Your IP: 94.101.178.10</html>")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got != "94.101.178.10" {
-		t.Fatalf("ip = %q", got)
-	}
-	if _, err := parseArvanTraceIP("<html>no ip</html>"); err == nil {
-		t.Fatal("expected missing ip error")
-	}
-}
-
-func TestLoopbackListenAddr(t *testing.T) {
-	for _, tc := range []struct {
-		in   string
-		want string
-	}{
-		{"0.0.0.0:40443", "127.0.0.1:40443"},
-		{":40443", "127.0.0.1:40443"},
-		{"127.0.0.1:40443", "127.0.0.1:40443"},
-	} {
-		if got := loopbackListenAddr(tc.in); got != tc.want {
-			t.Fatalf("loopbackListenAddr(%q) = %q, want %q", tc.in, got, tc.want)
-		}
-	}
-}
-
-func TestMethodMatrixCases(t *testing.T) {
-	if methodMatrixCaseDelay <= 0 {
-		t.Fatal("method matrix case delay must be positive")
-	}
-	cases := methodMatrixCases()
-	if len(cases) != 24 {
-		t.Fatalf("case count = %d, want 24", len(cases))
-	}
-
-	seen := make(map[string]bool)
-	for _, tc := range cases {
-		opts := tc.proxyOptions(injection.InjectorModeActive)
-		if opts.ackTimeout != 3*time.Second || opts.fakeDelay != 10*time.Millisecond ||
-			opts.fragmentDelay != 10*time.Millisecond || opts.sniChunk != 3 {
-			t.Fatalf("wrong constants for %s: %+v", tc.String(), opts)
-		}
-		seen[tc.String()] = true
-	}
-	for _, want := range []string{
-		"utls=none repeat=1 fragment=off",
-		"utls=firefox repeat=2 fragment=on",
-		"utls=edge repeat=2 fragment=on",
-	} {
-		if !seen[want] {
-			t.Fatalf("missing matrix case %q", want)
-		}
 	}
 }

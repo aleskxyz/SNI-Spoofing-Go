@@ -1,6 +1,6 @@
-//go:build darwin
+//go:build linux
 
-package main
+package proxy
 
 import (
 	"fmt"
@@ -11,9 +11,6 @@ import (
 	"sni-spoofing-go/injection"
 )
 
-// dialOutgoing opens the upstream TCP connection bound to the local interface IP and registers
-// the flow with the BPF injector before the handshake so the SYN/SYN-ACK/ACK are observed.
-// Mirrors dial_linux.go; macOS needs no SO_MARK (the BPF tap is passive, not a routed queue).
 func dialOutgoing(
 	interfaceIPv4, connectIP string, connectPort int,
 	fakeData []byte, bypassMethod string,

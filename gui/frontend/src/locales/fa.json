@@ -1,0 +1,61 @@
+{
+  "app": {
+    "title": "جعل SNI",
+    "subtitle": "دور زدن DPI با تزریق ClientHello جعلی"
+  },
+  "status": {
+    "running": "در حال اجرا",
+    "stopped": "متوقف",
+    "testing": "در حال آزمایش"
+  },
+  "form": {
+    "section_connection": "اتصال",
+    "section_injection": "تزریق",
+    "section_fragmentation": "قطعه‌بندی",
+    "listen": "آدرس شنود",
+    "listen_help": "آدرس پروکسی محلی، مثلاً 127.0.0.1:40443",
+    "connect": "سرور مقصد",
+    "connect_help": "آی‌پی:پورت یا نام میزبان:پورت",
+    "fake_sni": "SNI جعلی",
+    "fake_sni_help": "نام میزبان فریب‌دهنده‌ای که به DPI نشان داده می‌شود",
+    "utls": "اثرانگشت TLS",
+    "injector": "پشت‌بان تزریق",
+    "fake_repeat": "تعداد تزریق جعلی",
+    "fake_delay": "تأخیر تزریق (میلی‌ثانیه)",
+    "ack_timeout": "مهلت ACK (میلی‌ثانیه)",
+    "enable_fragment": "قطعه‌بندی ClientHello واقعی",
+    "fragment_delay": "تأخیر قطعه‌بندی (میلی‌ثانیه)",
+    "sni_chunk": "اندازه قطعه SNI (بایت)"
+  },
+  "actions": {
+    "start": "شروع",
+    "stop": "توقف",
+    "test": "اجرای ماتریس آزمایش",
+    "cancel_test": "لغو آزمایش",
+    "clear_logs": "پاک کردن گزارش‌ها"
+  },
+  "logs": {
+    "title": "گزارش‌ها",
+    "empty": "هنوز گزارشی نیست"
+  },
+  "test": {
+    "title": "نتایج آزمایش",
+    "col_utls": "uTLS",
+    "col_repeat": "تکرار",
+    "col_fragment": "قطعه‌بندی",
+    "col_result": "نتیجه",
+    "pass": "موفق",
+    "fail": "ناموفق",
+    "on": "فعال",
+    "off": "غیرفعال",
+    "external_ip": "آی‌پی بیرونی",
+    "internal_ip": "آی‌پی درونی"
+  },
+  "lang": {
+    "label": "زبان"
+  },
+  "privilege": {
+    "banner_windows": "این برنامه برای کنترل تزریق‌کننده‌ی بسته‌ها به دسترسی Administrator نیاز دارد. این پنجره را ببندید، روی فایل اجرایی راست‌کلیک کنید و Run as administrator را انتخاب نمایید.",
+    "banner_unix": "این برنامه برای کنترل تزریق‌کننده‌ی بسته‌ها به دسترسی root نیاز دارد. لطفاً برنامه را با sudo اجرا کنید (مثلاً sudo ./sni-spoofing-gui)."
+  }
+}

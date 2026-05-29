@@ -31,3 +31,13 @@ Thumbs.db
 WinDivert.dll
 WinDivert32.sys
 WinDivert64.sys
+
+# Wails GUI build outputs and generated bindings
+/gui/build/bin/
+/gui/sni-spoofing-gui*.exe
+/gui/frontend/dist/*
+!/gui/frontend/dist/.gitkeep
+/gui/frontend/node_modules/
+/gui/frontend/wailsjs/
+# wails build cache stamp — regenerated whenever package.json changes
+/gui/frontend/package.json.md5
