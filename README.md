@@ -233,12 +233,34 @@ apk update
 apk install iptables-mod-nfqueue kmod-nfnetlink-queue
 ```
 
-## Build
+## GUI (experimental)
+
+A cross-platform desktop GUI built with [Wails v2](https://wails.io) + Svelte lives in [gui/](gui/). It runs on Windows, Linux, and macOS, and ships with English and Persian translations using the Vazirmatn font.
+
+Prerequisites: Go 1.25+ (matches [gui/go.mod](gui/go.mod)), Node.js 20.19+ (Vite 7 requirement), and the Wails CLI:
 
 ```bash
-go mod download
-make build
+go install github.com/wailsapp/wails/v2/cmd/wails@v2.12.0
 ```
+
+Build the GUI:
+
+```bash
+cd gui
+wails build
+# binary lands in gui/build/bin/
+```
+
+Run the GUI in dev mode (hot reload):
+
+```bash
+cd gui
+wails dev
+```
+
+The GUI needs the same elevated privileges as the CLI (Administrator on Windows, root on Linux/macOS). Start/Stop/RunTest are wired to the shared `sni-spoofing-go/proxy` package, which is the same code path the CLI exercises.
+
+## Build release targets
 
 Build all release targets:
 

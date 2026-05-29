@@ -1,0 +1,61 @@
+{
+  "app": {
+    "title": "SNI Spoofing",
+    "subtitle": "DPI bypass via fake ClientHello injection"
+  },
+  "status": {
+    "running": "Running",
+    "stopped": "Stopped",
+    "testing": "Testing"
+  },
+  "form": {
+    "section_connection": "Connection",
+    "section_injection": "Injection",
+    "section_fragmentation": "Fragmentation",
+    "listen": "Listen address",
+    "listen_help": "Local proxy address, e.g. 127.0.0.1:40443",
+    "connect": "Upstream",
+    "connect_help": "IP:port or hostname:port",
+    "fake_sni": "Fake SNI",
+    "fake_sni_help": "Decoy hostname shown to DPI",
+    "utls": "TLS fingerprint",
+    "injector": "Injector backend",
+    "fake_repeat": "Fake injections",
+    "fake_delay": "Fake delay (ms)",
+    "ack_timeout": "ACK timeout (ms)",
+    "enable_fragment": "Fragment real ClientHello",
+    "fragment_delay": "Fragment delay (ms)",
+    "sni_chunk": "SNI chunk size (bytes)"
+  },
+  "actions": {
+    "start": "Start",
+    "stop": "Stop",
+    "test": "Run test matrix",
+    "cancel_test": "Cancel test",
+    "clear_logs": "Clear logs"
+  },
+  "logs": {
+    "title": "Logs",
+    "empty": "No logs yet"
+  },
+  "test": {
+    "title": "Test results",
+    "col_utls": "uTLS",
+    "col_repeat": "Repeat",
+    "col_fragment": "Fragment",
+    "col_result": "Result",
+    "pass": "PASS",
+    "fail": "FAIL",
+    "on": "on",
+    "off": "off",
+    "external_ip": "External IP",
+    "internal_ip": "Internal IP"
+  },
+  "lang": {
+    "label": "Language"
+  },
+  "privilege": {
+    "banner_windows": "This app needs Administrator privileges to drive the packet injector. Close this window, right-click the executable, and choose Run as administrator.",
+    "banner_unix": "This app needs root to drive the packet injector. Relaunch with sudo (e.g. sudo ./sni-spoofing-gui)."
+  }
+}

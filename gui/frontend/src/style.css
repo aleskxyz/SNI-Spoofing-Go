@@ -1,0 +1,65 @@
+:root {
+  color-scheme: dark;
+  --bg: #121620;
+  --panel: #1a2030;
+  --panel-2: #232a3d;
+  --border: #2c344a;
+  --text: #e6e8ee;
+  --muted: #8b93a7;
+  --accent: #4ea1ff;
+  --accent-strong: #2a7fd6;
+  --ok: #3ddc97;
+  --err: #ff6b6b;
+  --warn: #ffd66b;
+  --radius: 8px;
+  --gap: 16px;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Vazirmatn", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html[dir="rtl"] body {
+  font-feature-settings: "ss02", "ss03";
+}
+
+#app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+input,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Logical properties so the layout flips with `dir` automatically. */
+.row {
+  display: flex;
+  gap: var(--gap);
+  align-items: center;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
